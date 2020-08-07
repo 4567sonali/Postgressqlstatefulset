@@ -1,0 +1,72 @@
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: postgres-gcp
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: postgres-config-demo
+  namespace: postgres-gcp
+  labels:
+    app: postgres
+data:
+  POSTGRES_DB: demopostgresdb
+  POSTGRES_USER: demopostgresadmin
+  POSTGRES_PASSWORD: demopostgrespwd
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgres
+  namespace: postgres-gcp
+  labels:
+    app: postgres
+spec:
+  selector:
+    app: postgres
+  type: NodePort
+  ports:
+    - protocol: TCP
+      port: 5432
+      targetPort: 5432
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: postgres-demo
+  namespace: postgres-gcp
+spec:
+  serviceName: "postgres"
+  replicas: 2
+  selector:
+    matchLabels:
+      app: postgres
+  template:
+    metadata:
+      labels:
+        app: postgres
+    spec:
+      containers:
+        - name: postgres
+          image: postgres:latest
+          envFrom:
+            - configMapRef:
+                name: postgres-config-demo
+          ports:
+            - containerPort: 5432
+              name: postgredb
+          volumeMounts:
+            - name: postgredb
+              mountPath: /var/lib/postgresql/data
+              subPath: postgres
+  volumeClaimTemplates:
+    - metadata:
+        name: postgredb
+      spec:
+        accessModes: [ "ReadWriteOnce" ]
+        storageClassName: standard
+        resources:
+          requests:
+            storage: 3Gi
