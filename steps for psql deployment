@@ -1,0 +1,38 @@
+1.gcloud config set compute/zone <zone name>
+2.gcloud container clusters create <cluster name>
+3.vi <file name>
+in this config file we are updating :
+•	Postgres Docker Image to deploy. – used here lastest image
+•	 Created Configmap for storing Postgres configurations.
+•	 Created Postgres Statefulset to deploy the pods and to auto create the PV/PVC.
+•	 Postgres Service to expose the statefulset.
+config-The first resource we need to create is the configurations where it have  to inject into postgres pod with a configmap.
+We have to pass in the username, password and the database.
+service-Next resource to create is the postgres service so we can have multiple backends with a service that other services can connect with
+stateful-Next resource to create is postgres statefulset. Resource for statefulset looks like:
+In this yaml we can see that we are consuming the configmap we created 
+storage class-we are also at the bottom of the file creating a volume claim automatically with the help of the storage class standard
+
+*Lets verify that the configmap actually got injected by first checking the service that fronts out statefulset.
+
+
+4.kubectl get pods 
+
+
+5.kubectl get svc 
+
+Now we can connect with node port 31556 and the public IP address of the node our pod is running on.
+
+For exposing service, used nodeport
+psql -h <external ip of node> -U demopostgresadmin -p 30315 demopostgresdb
+now it will ask for password
+output:demopostgresdb=# 
+*let me create database by insering data
+
+CREATE TABLE accounts (username VARCHAR ( 50 ),email VARCHAR ( 255 ));
+here i have created the table for postgress db
+INSERT INTO accounts(username, email) VALUES ('reenal', 'reena@gmail’);
+here you can insert data for example above
+select * from accounts;
+here you can select and see data 
+*************this is done with Posgresssql stateful deployment(NOTE:for showing the deployment i have used node port but for real time it is not recommended)
