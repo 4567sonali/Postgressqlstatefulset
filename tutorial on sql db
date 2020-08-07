@@ -1,0 +1,38 @@
+*Here are some key benefits:
+•	No installation after container start-up
+•	Portability across environments
+•	Easy to start, stop, and update
+•	Services are isolated for better security
+*Requirements for SQL databases on Kubernetes
+When you want to run a stateful component, such as SQL Server, in Kubernetes, there are several components that you need to be aware of. 
+These components enable you to run your databases without fear of losing data should a container fail.
+
+*Stateful sets:
+Stateful sets are API objects that ensure that pods are unique and ordered.
+When pods are deployed in a StatefulSet, each has a persistent identifier that it retains regardless of rescheduling. 
+This persistent ID enables you to reconnect pods to the correct storage after a pod has failed.
+
+*Persistent volumes:
+Persistent volumes are storage resources in Kubernetes that operate independently of attached pods. 
+These resources can be provisioned statically at configuration or dynamically through Storage Classes.
+When you use persistent volumes, you create a PersistentVolumeClaim that operates like a pod. 
+You can attach pods to this claim to allow them to use the persistent storage you created.
+
+#Deploy MySQL:
+You can run a stateful application by creating a Kubernetes Deployment and connecting it to an existing PersistentVolume using a PersistentVolumeClaim. 
+
+###statefulset is that it will create a volume for each of the pod and if any of the pods gets delete, the volume will persist
+###The default StorageClass is used when a PersistentVolumeClaim doesn't specify a StorageClassName.
+
+*Access modes:
+PersistentVolumes support the following access modes:
+•	ReadWriteOnce: The volume can be mounted as read-write by a single node.
+•	ReadOnlyMany: The volume can be mounted read-only by many nodes.
+•	ReadWriteMany: The volume can be mounted as read-write by many nodes. PersistentVolumes that are backed by Compute Engine persistent disks don't support this access mode.
+
+
+Conclusion
+SQL database infrastructure containerization is not necessarily different from building and deploying any other mission-critical database.
+However, you need to consider the implications of moving mission-critical data to Kubernetes and containers.
+Databases on Kubernetes do not include concepts like failover elections, replication, and sharding like in MongoDB or Cassandra.
+You should put the right level of management and monitoring in place if you want to use Kubernetes and containers for production databases.
